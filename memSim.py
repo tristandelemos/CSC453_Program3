@@ -6,6 +6,7 @@ Simulates virtual memory by translating virtual memory addresses to physical mem
 
 import sys
 
+page_fifo_i = 0
 
 def add_to_tlb(tlb, page_num, frame):
     if (len(tlb) < 16):
