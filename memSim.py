@@ -151,6 +151,50 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
     print(f'TLB Hit Rate = {1 - (faults/total):.3f}')
 
 
+
+
+def opt(file, tlb, ptable, memory, frames):
+    total = 0
+    frame_num = 0
+    frame = 0
+    block = 0
+    byte = 0
+    faults = 0
+    hits = 0
+
+    # now all lines of the file are in the lines list
+    lines = file.readlines()
+
+    for line in lines:
+
+        # if we have not filled all of the frames in physical memory
+        if total < frames:
+
+            # check if we already have it in physical memory
+            pass
+
+        # if we have filled all of the frames
+        else:
+
+            # check for which ones will be used
+
+            #  find oldest out of the frames that will not be used in future
+
+            pass
+
+    print()
+    print(f'Number of Translated Addresses = {total}')
+    print(f'Page Faults = {faults}')
+    print(f'Page Fault Rate = {faults / total:.3f}')
+    print(f'TLB Hits = {hits}')
+    print(f'TLB Misses = {total - hits}')
+    print(f'TLB Hit Rate = {1 - (faults / total):.3f}')
+
+
+
+
+
+
 def main():
     tlb = []
 
