@@ -7,6 +7,19 @@ Simulates virtual memory by translating virtual memory addresses to physical mem
 import sys
 
 
+def add_to_tlb(tlb, page_num, frame):
+    if (len(tlb) < 16):
+        #append to end of fifo queue
+        tlb.append((page_num, frame))
+    else:
+        #remove oldest, then append
+        tlb.pop(0)
+        tlb.append((page_num, frame))
+
+    return
+
+
+
 def hardcoded(file, tlb, ptable):
     lines = file.readlines()
     frame = 0
@@ -32,13 +45,7 @@ def hardcoded(file, tlb, ptable):
             if entry[2] != -1:
                 frame = entry[1]
                 # put into TLB
-                if (len(tlb) < 16):
-                    #append to end of fifo queue
-                    tlb.append((page_num, frame))
-                else:
-                    #remove oldest, then append
-                    tlb.pop(0)
-                    tlb.append((page_num, frame))
+                add_to_tlb(tlb, page_num, frame)
 
             else:
                 # if not in page table, check BACKING_STORE.bin
