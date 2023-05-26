@@ -61,14 +61,15 @@ def hardcoded(file, tlb, ptable):
                 backend = open('BACKING_STORE.bin', 'rb')
                 i = 0
 
-                try:
-                    l = backend.read(256)
-                    #if i == page_num:
-                    print(l)
-                    i += 1
-                    print(i)
-                except StopIteration:
-                    break
+                while (i != 256):
+                    try:
+                        l = backend.read(256)
+                        #if i == page_num:
+                        print("i:", i)
+                        print("bytes:", list(l))
+                        i += 1
+                    except StopIteration:
+                        break
             backend.close()
 
         # print third part of printout
