@@ -28,7 +28,9 @@ def hardcoded(file, tlb, ptable):
         # take out only first four bits to find page number
         virtual = bin(int(line))
         virtual = virtual[2:]
-        page_num = int(virtual[0:8], 2)
+        page_num = int(virtual[0:7], 2)
+        offset = int(virtual[8:], 2)
+        print("offset: ", offset)
         # check TLB for frame num
         in_tlb = False
         framenum = -1
@@ -43,7 +45,6 @@ def hardcoded(file, tlb, ptable):
 
         else:
             # if not in TLB check in page table
-            print(page_num)
             entry = ptable[page_num]
             if entry[2] != -1:
                 frame = entry[1]
@@ -64,9 +65,12 @@ def hardcoded(file, tlb, ptable):
                 while (i != 256):
                     try:
                         l = backend.read(256)
-                        #if i == page_num:
-                        print("i:", i)
-                        print("bytes:", list(l))
+                        if i == page_num:
+                            block = list(l)
+                            print("i:", i)
+                            print("bytes:", list(l))
+                            byte = block[offset]
+                            print("byte: ", byte)
                         i += 1
                     except StopIteration:
                         break
