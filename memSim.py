@@ -59,6 +59,7 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                 framenum = pair[1]
                 hits += 1
         if in_tlb:
+            #printing info
             block = memory[framenum]
             frame = framenum
             byte = block[offset]
@@ -70,14 +71,7 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
             entry = ptable[page_num]
             if entry[2] != -1:
                 frame = entry[1]
-                # put into TLB
-                if len(tlb) < 16:
-                    # append to end of fifo queue
-                    tlb.append((page_num, frame))
-                else:
-                    # remove oldest, then append
-                    tlb.pop(0)
-                    tlb.append((page_num, frame))
+                add_to_tlb(tlb, page_num, frame)
 
                 #update process usage parameter / valid bit
                 if algorithm == "LRU":
@@ -85,12 +79,17 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                     ptable[page_num] = (old_entry[0], LRU_i)
                     LRU_i += 1
 
+                #printing info
+                block = memory[frame]
+                byte = block[offset]
+
             else:
                 # if not in page table, check BACKING_STORE.bin
                 backend = open('BACKING_STORE.bin', 'rb')
                 i = 0
                 faults += 1
 
+                #while num pages < page table size
                 while (i != 256):
                     try:
                         l = backend.read(256)
@@ -105,6 +104,8 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                             if algorithm == "FIFO" or algorithm == "LRU":
                                 #update page table with new page
                                 ptable[page_num] = (frame_num, LRU_i)
+                                #update prints
+                                frame = frame_num
                                 #increase num pages added
                                 LRU_i += 1
                                 #if more pages than frames
@@ -137,7 +138,8 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
         for index in block:
             print(f'{index:X}', end='')
 
-        frame += 1
+        print("total:", total)
+        # frame += 1
         total += 1
 
     print()
@@ -179,8 +181,8 @@ def main():
         return 0
 
     # if given only a txt file, use default
-    if numOfArgs == 2:
-        hardcoded(file, tlb, ptable)
+    # if numOfArgs == 2:
+    #     hardcoded(file, tlb, ptable, memory, frames, algorithm)
 
     if numOfArgs > 2:
         frames = int(sys.argv[2])
