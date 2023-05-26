@@ -25,16 +25,24 @@ def hardcoded(file, tlb, ptable):
                 framenum = pair[1]
         if in_tlb:
             print(framenum)
-        else:
-            if (len(tlb) < 16):
-                tlb.append(())
 
-        # if not in TLB check in page table
-        entry = ptable[int(page_num)]
-        if entry[2] != -1:
-            frame = entry[1]
-            # put into TLB
-        # if not in page table, check BACKING_STORE.bin
+        else:
+            # if not in TLB check in page table
+            entry = ptable[int(page_num)]
+            if entry[2] != -1:
+                frame = entry[1]
+                # put into TLB
+                if (len(tlb) < 16):
+                    #append to end of fifo queue
+                    tlb.append((page_num, frame))
+                else:
+                    #remove oldest, then append
+                    tlb.pop(0)
+                    tlb.append((page_num, frame))
+
+            else:
+                # if not in page table, check BACKING_STORE.bin
+                pass
 
 
 def main():
