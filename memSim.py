@@ -9,7 +9,7 @@ import sys
 
 def hardcoded(file):
     lines = file.readlines()
-
+    frame = 0
     # go through each line of the file
     for line in lines:
         # take out only first four bits to find page number
@@ -17,11 +17,12 @@ def hardcoded(file):
         virtual = virtual[2:]
         page_num = virtual[0:7]
         # check TLB for frame num
-        for index in TLB:
-            if int(page_num)  ==
+
         # if not in TLB check in page table
-        for index in ptable:
-            if int(page_num) ==
+        entry = ptable[int(page_num)]
+        if entry[2] != -1:
+            frame = entry[1]
+            # put into TLB
         # if not in page table, check BACKING_STORE.bin
 
 
