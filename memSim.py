@@ -12,10 +12,14 @@ def hardcoded():
 
 
 def main():
-
+    page_table = (-1, -1)
+    page_table = [page_table] * 256
     algorithm = "FIFO"
     frames = 256
     # check for algorithm
+
+    """
+    
     numOfArgs = len(sys.argv)
     if numOfArgs > 1:
         file = open(str(sys.argv[1]), "r")
@@ -25,7 +29,7 @@ def main():
     hardcoded()
 
 
-    """
+    
     if numOfArgs > 4 or numOfArgs == 1:
         print("Usage: memSim <reference.txt> <FRAME_SIZE> <ALGORITHM>")
         return 0
@@ -38,3 +42,7 @@ def main():
 
     """
     return 0
+
+
+if __name__ == '__main__':
+    main()
