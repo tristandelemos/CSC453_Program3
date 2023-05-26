@@ -30,45 +30,43 @@ def add_to_memory(memory, frame, max_frames, frame_num):
 
 def hardcoded(file, tlb, ptable, memory, frames):
 
+    total = 0
     frame_num = 0
     frame = 0
     block = 0
+    byte = 0
+    faults = 0
+    hits = 0
     # go through each line of the file
     lines = file.readlines()
     for line in lines:
         # take out only first four bits to find page number
         print()
         virtual = bin(int(line))
-        # print("virtual addr:", virtual)
         virtual = virtual[2:]
-        # print(len(virtual))
         while (len(virtual) < 16):
             virtual = "0" + virtual
-        #print("virtual post-fix:", virtual[0:8], virtual[8:16])
         page_num = int(virtual[0:8], 2)
-        # print("virt", virtual[0:8])
-        # print("pn", page_num)
         offset = int(virtual[8:16], 2)
-        #print("offset: ", offset)
         # check TLB for frame num
         in_tlb = False
         framenum = -1
 
-
         for pair in tlb:
-            if (pair[0] == page_num):
+            if pair[0] == page_num:
                 in_tlb = True
                 framenum = pair[1]
+                hits += 1
         if in_tlb:
             print(framenum)
 
+        # if not in TLB check in page table
         else:
-            # if not in TLB check in page table
             entry = ptable[page_num]
             if entry[2] != -1:
                 frame = entry[1]
                 # put into TLB
-                if (len(tlb) < 16):
+                if len(tlb) < 16:
                     # append to end of fifo queue
                     tlb.append((page_num, frame))
                 else:
@@ -80,6 +78,7 @@ def hardcoded(file, tlb, ptable, memory, frames):
                 # if not in page table, check BACKING_STORE.bin
                 backend = open('BACKING_STORE.bin', 'rb')
                 i = 0
+                faults += 1
 
                 while (i != 256):
                     try:
@@ -97,7 +96,7 @@ def hardcoded(file, tlb, ptable, memory, frames):
                         i += 1
                     except StopIteration:
                         break
-            backend.close()
+                backend.close()
 
         # print third part of printout
         print(f'{int(line)}, {byte}, {frame},')
@@ -105,8 +104,14 @@ def hardcoded(file, tlb, ptable, memory, frames):
             print(f'{index:X}', end='')
 
         frame += 1
+        total += 1
 
-
+    print(f'Number of Translated Addresses = {total}')
+    print(f'Page Faults = {faults}')
+    print(f'Page Fault Rate = {faults/total:.3f}')
+    print(f'TLB Hits = {hits}')
+    print(f'TLB Misses = {total - hits}')
+    print(f'TLB Hit Rate = {1 - (faults/total):.3f}')
 
 
 def main():
@@ -133,11 +138,14 @@ def main():
 
     # print(memory)
 
-    """"
-    
+
     if numOfArgs > 4 or numOfArgs == 1:
         print("Usage: memSim <reference.txt> <FRAME_SIZE> <ALGORITHM>")
         return 0
+
+    # if given only a txt file, use default
+    if numOfArgs == 2:
+        hardcoded(file, tlb, ptable)
 
     if numOfArgs > 2:
         frames = int(sys.argv[2])
@@ -145,7 +153,6 @@ def main():
     if numOfArgs > 3:
         algorithm = sys.argv[3]
 
-    """
     return 0
 
 
