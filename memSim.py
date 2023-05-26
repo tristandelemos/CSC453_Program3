@@ -7,7 +7,7 @@ Simulates virtual memory by translating virtual memory addresses to physical mem
 import sys
 
 
-def hardcoded(file):
+def hardcoded(file, tlb, ptable):
     lines = file.readlines()
 
     # go through each line of the file
@@ -15,8 +15,19 @@ def hardcoded(file):
         # take out only first four bits to find page number
         virtual = bin(int(line))
         virtual = virtual[2:]
-        page_num = virtual[0:3]
+        page_num = virtual[0:7]
         # check TLB for frame num
+        in_tlb = False
+        framenum = -1
+        for pair in tlb:
+            if (pair[0] == page_num):
+                in_tlb = True
+                framenum = pair[1]
+        if in_tlb:
+            print(framenum)
+        else:
+            if (len(tlb) < 16):
+                tlb.append(())
 
         # if not in TLB check in page table
         
@@ -24,8 +35,11 @@ def hardcoded(file):
 
 
 def main():
-    page_table = [-1, -1, -1]
-    page_table = [page_table] * 256
+
+    tlb = []
+
+    ptable = [-1, -1, -1]
+    ptable = [ptable] * 256
 
     algorithm = "FIFO"
     frames = 256
