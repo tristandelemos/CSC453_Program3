@@ -7,18 +7,31 @@ Simulates virtual memory by translating virtual memory addresses to physical mem
 import sys
 
 
-def hardcoded():
-    pass
+def hardcoded(file):
+    lines = file.readlines()
+
+    # go through each line of the file
+    for line in lines:
+        # take out only first four bits to find page number
+        virtual = bin(int(line))
+        virtual = virtual[2:]
+        page_num = virtual[0:3]
+        # check TLB for frame num
+
+        # if not in TLB check in page table
+        
+        # if not in page table, check BACKING_STORE.bin
 
 
 def main():
-    page_table = (-1, -1)
+    page_table = [-1, -1, -1]
     page_table = [page_table] * 256
+
     algorithm = "FIFO"
     frames = 256
     # check for algorithm
 
-    """
+
     
     numOfArgs = len(sys.argv)
     if numOfArgs > 1:
@@ -26,9 +39,9 @@ def main():
     else:
         file = open("fifo1.txt", "r")
 
-    hardcoded()
+    hardcoded(file)
 
-
+    """"
     
     if numOfArgs > 4 or numOfArgs == 1:
         print("Usage: memSim <reference.txt> <FRAME_SIZE> <ALGORITHM>")
