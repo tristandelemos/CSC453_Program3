@@ -6,7 +6,7 @@ Simulates virtual memory by translating virtual memory addresses to physical mem
 
 import sys
 
-page_fifo_i = 0
+
 
 def add_to_tlb(tlb, page_num, frame):
     if (len(tlb) < 16):
@@ -19,8 +19,18 @@ def add_to_tlb(tlb, page_num, frame):
 
     return
 
-def hardcoded(file, tlb, ptable):
+def add_to_memory(memory, frame, max_frames, frame_num):
+    if frame_num == max_frames:
+        frame_num = 0
 
+    # print("frame num:", frame_num)
+    memory[frame_num] = frame
+
+    return
+
+def hardcoded(file, tlb, ptable, memory, frames):
+
+    frame_num = 0
     frame = 0
     block = 0
     # go through each line of the file
@@ -76,18 +86,14 @@ def hardcoded(file, tlb, ptable):
                         l = backend.read(256)
                         if i == page_num:
                             block = list(l)
-                            # print()
-                            # print(page_num)
-                            #print(int(line))
-                            #print("i:", i)
-                            #print("offset:", offset)
-                            # print("bytes:", list(l))
                             byte = block[offset]
-                            #print("byte:", byte)
                             if byte > 127:
                                 byte = 256 - byte
                                 byte = byte * -1
-                            #print("signed byte: ", byte)
+                            #add to page table / main memory
+                            add_to_memory(memory, l, frames, frame_num)
+                            ptable[page_num] = (frame_num, 1)
+                            frame_num += 1
                         i += 1
                     except StopIteration:
                         break
@@ -119,7 +125,13 @@ def main():
     else:
         file = open("fifo1.txt", "r")
 
-    hardcoded(file, tlb, ptable)
+
+    memory = [-1] * frames
+    # print("memory:", len(memory))
+
+    hardcoded(file, tlb, ptable, memory, frames)
+
+    # print(memory)
 
     """"
     
