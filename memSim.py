@@ -18,20 +18,21 @@ def add_to_tlb(tlb, page_num, frame):
 
     return
 
-
-
 def hardcoded(file, tlb, ptable):
-    lines = file.readlines()
+
     frame = 0
     # go through each line of the file
+    lines = file.readlines()
     for line in lines:
         # take out only first four bits to find page number
         virtual = bin(int(line))
         virtual = virtual[2:]
-        page_num = virtual[0:7]
+        page_num = int(virtual[0:8], 2)
         # check TLB for frame num
         in_tlb = False
         framenum = -1
+
+
         for pair in tlb:
             if (pair[0] == page_num):
                 in_tlb = True
@@ -41,19 +42,42 @@ def hardcoded(file, tlb, ptable):
 
         else:
             # if not in TLB check in page table
-            entry = ptable[int(page_num)]
+            print(page_num)
+            entry = ptable[page_num]
             if entry[2] != -1:
                 frame = entry[1]
                 # put into TLB
-                add_to_tlb(tlb, page_num, frame)
+                if (len(tlb) < 16):
+                    # append to end of fifo queue
+                    tlb.append((page_num, frame))
+                else:
+                    # remove oldest, then append
+                    tlb.pop(0)
+                    tlb.append((page_num, frame))
 
             else:
                 # if not in page table, check BACKING_STORE.bin
-                pass
+                backend = open('BACKING_STORE.bin', 'rb')
+                i = 0
+
+                try:
+                    l = backend.read(256)
+                    #if i == page_num:
+                    print(l)
+                    i += 1
+                    print(i)
+                except StopIteration:
+                    break
+            backend.close()
+
+        # print third part of printout
+        #print(line, ", ", byte_ref, ", ", frame, ", ")
+        frame += 1
+
+
 
 
 def main():
-
     tlb = []
 
     ptable = [-1, -1, -1]
@@ -63,15 +87,13 @@ def main():
     frames = 256
     # check for algorithm
 
-
-    
     numOfArgs = len(sys.argv)
     if numOfArgs > 1:
         file = open(str(sys.argv[1]), "r")
     else:
         file = open("fifo1.txt", "r")
 
-    hardcoded(file)
+    hardcoded(file, tlb, ptable)
 
     """"
     
