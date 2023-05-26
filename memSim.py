@@ -22,6 +22,7 @@ def add_to_tlb(tlb, page_num, frame):
 def hardcoded(file, tlb, ptable):
 
     frame = 0
+    block = 0
     # go through each line of the file
     lines = file.readlines()
     for line in lines:
@@ -33,12 +34,12 @@ def hardcoded(file, tlb, ptable):
         # print(len(virtual))
         while (len(virtual) < 16):
             virtual = "0" + virtual
-        print("virtual post-fix:", virtual[0:8], virtual[8:16])
+        #print("virtual post-fix:", virtual[0:8], virtual[8:16])
         page_num = int(virtual[0:8], 2)
         # print("virt", virtual[0:8])
         # print("pn", page_num)
         offset = int(virtual[8:16], 2)
-        print("offset: ", offset)
+        #print("offset: ", offset)
         # check TLB for frame num
         in_tlb = False
         framenum = -1
@@ -77,23 +78,26 @@ def hardcoded(file, tlb, ptable):
                             block = list(l)
                             # print()
                             # print(page_num)
-                            print(int(line))
-                            print("i:", i)
-                            print("offset:", offset)
+                            #print(int(line))
+                            #print("i:", i)
+                            #print("offset:", offset)
                             # print("bytes:", list(l))
                             byte = block[offset]
-                            print("byte:", byte)
+                            #print("byte:", byte)
                             if byte > 127:
                                 byte = 256 - byte
                                 byte = byte * -1
-                            print("signed byte: ", byte)
+                            #print("signed byte: ", byte)
                         i += 1
                     except StopIteration:
                         break
             backend.close()
 
         # print third part of printout
-        #print(line, ", ", byte_ref, ", ", frame, ", ")
+        print(f'{int(line)}, {byte}, {frame},')
+        for index in block:
+            print(f'{index:X}', end='')
+
         frame += 1
 
 
