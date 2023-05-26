@@ -28,9 +28,8 @@ def add_to_memory(memory, frame, max_frames, frame_num):
 
     return
 
-def hardcoded(file, tlb, ptable, memory, frames, algorithm):
+def hardcoded(file, tlb, ptable, memory, frames):
 
-    LRU_i = 0
     total = 0
     frame_num = 0
     frame = 0
@@ -58,8 +57,8 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                 in_tlb = True
                 framenum = pair[1]
                 hits += 1
-        # if in_tlb:
-        #     print(framenum)
+        if in_tlb:
+            print(framenum)
 
         # if not in TLB check in page table
         else:
@@ -74,12 +73,6 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                     # remove oldest, then append
                     tlb.pop(0)
                     tlb.append((page_num, frame))
-
-                #update process usage parameter / valid bit
-                if algorithm == "LRU":
-                    old_entry = ptable[page_num]
-                    ptable[page_num] = (old_entry[0], LRU_i)
-                    LRU_i += 1
 
             else:
                 # if not in page table, check BACKING_STORE.bin
@@ -98,31 +91,8 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                                 byte = byte * -1
                             #add to page table / main memory
                             add_to_memory(memory, l, frames, frame_num)
-                            if algorithm == "FIFO" or algorithm == "LRU":
-                                #update page table with new page
-                                ptable[page_num] = (frame_num, LRU_i)
-                                #increase num pages added
-                                LRU_i += 1
-                                #if more pages than frames
-                                if LRU_i >= frames:
-                                    #determine oldest frame (earliest use and/or placement)
-                                    min = -1
-                                    min_i = -1
-                                    for i in range(len(ptable)):
-                                        if min == -1:
-                                            min = ptable[i][1]
-                                            min_i = i
-                                        if ptable[i][1] < min:
-                                            min = ptable[i][1]
-                                            min_i = i
-                                    #next frame to be updated will be least recently used
-                                    frame_num = min_i
-                            #add to tlb
-                            add_to_tlb(tlb, page_num, frame_num)
-
-                            #increment
-                            if LRU_i < frames:
-                                frame_num += 1
+                            ptable[page_num] = (frame_num, 1)
+                            frame_num += 1
                         i += 1
                     except StopIteration:
                         break
@@ -135,7 +105,6 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
 
         frame += 1
         total += 1
-
     print()
     print(f'Number of Translated Addresses = {total}')
     print(f'Page Faults = {faults}')
@@ -143,6 +112,36 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
     print(f'TLB Hits = {hits}')
     print(f'TLB Misses = {total - hits}')
     print(f'TLB Hit Rate = {1 - (faults/total):.3f}')
+
+
+def opt(file, tlb, ptable, memory, frames):
+    total = 0
+    frame_num = 0
+    frame = 0
+    block = 0
+    byte = 0
+    faults = 0
+    hits = 0
+
+    # now all lines of the file are in the lines list
+    lines = file.readlines()
+
+    for line in lines:
+
+        if total < frames:
+            # if we have not filled all of the frames in physical memory
+            pass
+
+    print()
+    print(f'Number of Translated Addresses = {total}')
+    print(f'Page Faults = {faults}')
+    print(f'Page Fault Rate = {faults / total:.3f}')
+    print(f'TLB Hits = {hits}')
+    print(f'TLB Misses = {total - hits}')
+    print(f'TLB Hit Rate = {1 - (faults / total):.3f}')
+
+
+
 
 
 def main():
@@ -161,14 +160,7 @@ def main():
     else:
         file = open("fifo1.txt", "r")
 
-
     memory = [-1] * frames
-    # print("memory:", len(memory))
-
-    hardcoded(file, tlb, ptable, memory, frames, algorithm)
-
-    # print(memory)
-
 
     if numOfArgs > 4 or numOfArgs == 1:
         print("Usage: memSim <reference.txt> <FRAME_SIZE> <ALGORITHM>")
@@ -176,7 +168,7 @@ def main():
 
     # if given only a txt file, use default
     if numOfArgs == 2:
-        hardcoded(file, tlb, ptable)
+        hardcoded(file, tlb, ptable, frames)
 
     if numOfArgs > 2:
         frames = int(sys.argv[2])
