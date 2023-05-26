@@ -58,7 +58,11 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                 in_tlb = True
                 framenum = pair[1]
                 hits += 1
-        # if in_tlb:
+        if in_tlb:
+            block = memory[framenum]
+            frame = framenum
+            byte = block[offset]
+
         #     print(framenum)
 
         # if not in TLB check in page table
