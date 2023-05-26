@@ -15,11 +15,13 @@ def hardcoded(file):
         # take out only first four bits to find page number
         virtual = bin(int(line))
         virtual = virtual[2:]
-        page_num = virtual[0:3]
+        page_num = virtual[0:7]
         # check TLB for frame num
-
+        for index in TLB:
+            if int(page_num)  ==
         # if not in TLB check in page table
-        
+        for index in ptable:
+            if int(page_num) ==
         # if not in page table, check BACKING_STORE.bin
 
 
