@@ -226,6 +226,7 @@ def opt(file, tlb, ptable, memory, frames):
 
     # now all lines of the file are in the lines list
     lines = file.readlines()
+    
 
     for line in lines:
 
