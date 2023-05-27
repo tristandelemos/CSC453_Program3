@@ -42,7 +42,7 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
     lines = file.readlines()
     for line in lines:
         # take out only first four bits to find page number
-        print()
+        # print()
         virtual = bin(int(line))
         virtual = virtual[2:]
         while (len(virtual) < 16):
@@ -53,13 +53,13 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
         in_tlb = False
         framenum = -1
 
-        print(tlb)
+        # print(tlb)
         for pair in tlb:
             if pair[0] == page_num:
                 in_tlb = True
                 framenum = pair[1]
                 hits += 1
-                print("tlb hit")
+                # print("tlb hit")
         if in_tlb:
             #printing info
             block = memory[framenum]
@@ -90,7 +90,7 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                 #printing info
                 block = memory[frame]
                 byte = block[offset]
-                print("ptable hit")
+                # print("ptable hit")
 
             else:
                 # if not in page table, check BACKING_STORE.bin
@@ -106,7 +106,12 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                         #if frame is page
                         if i == page_num:
                             #list of bytes
+                            # print()
+                            # print("i:", i)
+                            # print(l)
                             block = list(l)
+                            # print(block)
+                            # print("offset:", offset)
                             byte = block[offset]
                             if byte > 127:
                                 byte = 256 - byte
@@ -114,7 +119,7 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                             
                             
                             if algorithm == "FIFO":
-                                print("FIFO")
+                                # print("FIFO")
                                 #check for flip around
                                 if fifo_i >= frames:
                                     fifo_i = 0
@@ -127,6 +132,14 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                                 #add to page table
                                 ptable[page_num] = (fifo_i, 1)
                                 frame = fifo_i
+                                
+                                #remove from tlb table
+                                for k in range(len(tlb)):
+                                    # print(tlb)
+                                    if tlb[k][1] == frame:
+                                        tlb.pop(k)
+                                        break
+                                
                                 fifo_i += 1
 
                             if algorithm == "LRU":
@@ -141,7 +154,7 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
                                                 min = entry[1]
                                                 min_entry = entry
                                     #overwrite LRU frame and invalidate prev entry
-                                    print("min entry:", min_entry)
+                                    # print("min entry:", min_entry)
                                     for i in range(len(ptable)):
                                         if ptable[i] == min_entry:
                                             ptable[i] = (ptable[i][0], -1)
@@ -164,25 +177,28 @@ def hardcoded(file, tlb, ptable, memory, frames, algorithm):
 
                                 
                                 #remove from tlb table
-                                for i in range(len(tlb)):
-                                    if tlb[i][1] == frame:
-                                        tlb.pop(i)
+                                for k in range(len(tlb)):
+                                    # print(tlb)
+                                    if tlb[k][1] == frame:
+                                        tlb.pop(k)
+                                        break
 
                                 #add to tlb
-                                add_to_tlb(tlb, page_num, frame)
+                            add_to_tlb(tlb, page_num, frame)
                         i += 1
                     except StopIteration:
                         break
                 backend.close()
 
-            for entry in memory:
-                if entry != -1:
-                    print("entry:", entry[0:4])
+            # for entry in memory:
+            #     if entry != -1:
+            #         print("entry:", entry[0:4])
+            # print(tlb)
 
         # print third part of printout
         print(f'{int(line)}, {byte}, {frame},')
-        # for index in block:
-        #     print(f'{index:X}', end='')
+        for index in block:
+            print(f'{index:X}', end='')
 
         # print("total:", total)
         # frame += 1
