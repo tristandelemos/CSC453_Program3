@@ -223,27 +223,72 @@ def opt(file, tlb, ptable, memory, frames):
     byte = 0
     faults = 0
     hits = 0
+    opt_i = 0
+    in_tlb = False
 
     # now all lines of the file are in the lines list
     lines = file.readlines()
-    
 
+    index = 0
     for line in lines:
+        virtual = bin(int(line))
+        virtual = virtual[2:]
+        while (len(virtual) < 16):
+            virtual = "0" + virtual
+        page_num = int(virtual[0:8], 2)
+        offset = int(virtual[8:16], 2)
+
+        # check if it is in TLB
+        for pair in tlb:
+            if pair[0] == page_num:
+                in_tlb = True
+                framenum = pair[1]
+                hits += 1
+        if in_tlb:
+            # printing info
+            block = memory[framenum]
+            frame = framenum
+            byte = block[offset]
+
+
+        else:
+            entry = ptable[page_num]
+            if entry[2] != -1:
+                # if it is in the page table, add it to the TLB
+                frame = entry[1]
+                add_to_tlb(tlb, page_num, frame)
+
+                # update process usage parameter / valid bit
+
+                old_entry = ptable[page_num]
+                ptable[page_num] = (old_entry[0], opt_i)
+                opt_i += 1
+
+                # printing info
+                block = memory[frame]
+                byte = block[offset]
 
         # if we have not filled all of the frames in physical memory
         if total < frames:
 
             # check if we already have it in physical memory
+            add_to_tlb(tlb, page_num, frame)
+
+
             pass
 
         # if we have filled all of the frames
         else:
 
-            # check for which ones will be used
 
-            #  find oldest out of the frames that will not be used in future
+            # find oldest out of the frames
 
-            pass
+            # will that one be used?
+            if lines.index(memory[][1]) > -1:
+                # if it will not be used again, evict it
+                lines.index()
+                # if it will be used again, go to next oldest
+        in_tlb = False
 
     print()
     print(f'Number of Translated Addresses = {total}')
